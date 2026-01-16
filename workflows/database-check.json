@@ -1,0 +1,63 @@
+{
+  "name": "database-check",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "93cfc546-08c3-4f50-a4e5-9ff93b0137ca",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * \nFROM api_enrichments_seed.enriquecimentos;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        208,
+        0
+      ],
+      "id": "9f9a1b3a-bf64-4123-af5a-0ade0a344759",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "jWYAFjuHYePU5jRc",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "e2d794c6-d48a-46bf-8885-75579b806f5d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4dbf3b5b42c9c2baf39b6c31bc3c52a8c610bc9d25b51fea9a7705fdef4c3e2a"
+  },
+  "id": "IsxixnSaw7gKbaR-hN8wh",
+  "tags": []
+}
