@@ -2,11 +2,11 @@ services:
   postgres:
     image: postgres:17
     container_name: driva-postgres
-    environment: 
-      POSTGRES_USER: driva 
+    environment:
+      POSTGRES_USER: driva
       POSTGRES_PASSWORD: driva
       POSTGRES_DB: driva-dw
-    ports: 
+    ports:
       - "5432:5432"
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql # Bindmount.
@@ -32,12 +32,13 @@ services:
       N8N_BASIC_AUTH_PASSWORD: "admin"
     depends_on:
       - postgres
-    volumes: 
-      - n8n-data:/home/node/.n8n
+    volumes:
+      - n8n-data:/home/node/.n8n # Aqui persiste os workflows.
+      - ./workflows:/files # Bindmount para passar os workflows para o container.
     networks:
       - driva-net
 
-  api: 
+  api:
     build: ./api
     container_name: driva-api
     ports:
@@ -54,7 +55,7 @@ services:
     networks:
       - driva-net
 
-volumes: 
+volumes:
   postgres-data:
   n8n-data:
 
