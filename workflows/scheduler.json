@@ -1,0 +1,77 @@
+{
+  "name": "scheduler",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "Uxm-SlghMh4gTtgUcR252",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/Uxm-SlghMh4gTtgUcR252",
+          "cachedResultName": "ingestion"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "7fc8e7b2-8329-4757-8e51-fe1f6bfa1a0a",
+      "name": "Call 'ingestion'"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "86e2e077-8841-4482-a8bc-604605f732f8",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Call 'ingestion'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "b48de5ca-66c3-432e-82c8-6b693ce43869",
+  "meta": {
+    "instanceId": "532127a29babbf1fdd80b86cbe0240f1921f191d6c35b72962155da761ce9715"
+  },
+  "id": "LZr4ay4Ilzg9ytoiGTjgP",
+  "tags": []
+}

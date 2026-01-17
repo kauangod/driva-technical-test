@@ -2,17 +2,6 @@
   "name": "ingestion",
   "nodes": [
     {
-      "parameters": {},
-      "type": "n8n-nodes-base.manualTrigger",
-      "typeVersion": 1,
-      "position": [
-        -304,
-        0
-      ],
-      "id": "931630e8-3eaf-4011-bd8e-65f6069223cb",
-      "name": "When clicking ‘Execute workflow’"
-    },
-    {
       "parameters": {
         "url": "http://api:3000/people/v1/enrichments",
         "authentication": "predefinedCredentialType",
@@ -35,101 +24,206 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        144,
-        0
+        64,
+        208
       ],
-      "id": "a607de12-31a8-483e-8d9b-1d00e9089a56",
+      "id": "eb59f9ed-764a-4e9e-a10e-a8299a52e0bb",
       "name": "HTTP Request",
       "retryOnFail": true,
       "maxTries": 5,
       "credentials": {
         "httpBearerAuth": {
-          "id": "KSdx9j6elOT95dLH",
+          "id": "NDO1l3a6JH5BcoBH",
           "name": "Bearer Auth account"
         }
       }
     },
     {
       "parameters": {
-        "jsCode": "   const meta = $json.meta;\n   const nextPage = meta.current_page + 1;\n   if (nextPage > meta.total_pages) {\n     return [{ json: { done: true } }];\n   }\n   return [{ json: { page: nextPage, done: false } }];"
+        "jsCode": "const meta = $json.meta;\nconst currentPage = meta.current_page;\nconst totalPages = meta.total_pages;\n\nreturn [\n  {\n    json: {\n      page: currentPage + 1,\n      total: totalPages,\n    },\n  },\n];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        320,
-        0
+        240,
+        208
       ],
-      "id": "7c7b9b0a-fa7d-456a-948c-db71d95e4604",
+      "id": "e5ff7986-1c9d-4484-a182-5aa0c4bd966b",
       "name": "Code in JavaScript"
     },
     {
       "parameters": {
-        "rules": {
-          "values": [
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "value": "bronze",
+          "mode": "list",
+          "cachedResultName": "bronze"
+        },
+        "table": {
+          "__rl": true,
+          "value": "enriquecimentos",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{$json.id}}",
+            "payload_json": "={{$json.payload_json}}",
+            "dw_ingested_at": "2026-01-17T13:58:00",
+            "dw_updated_at": "2026-01-17T13:58:01",
+            "execution_id": "={{ $execution.id }}",
+            "source_page": "={{ $json.payload_json.meta.current_page }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
             {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "leftValue": "={{ $json.done }}",
-                    "rightValue": "",
-                    "operator": {
-                      "type": "boolean",
-                      "operation": "false",
-                      "singleValue": true
-                    },
-                    "id": "a9b27b44-37c9-4cd9-8b0b-6dfb975ff500"
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputKey": "Output 0"
+              "id": "id",
+              "displayName": "id",
+              "required": true,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
             },
             {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "id": "4341ab97-e03e-4356-922e-467ba576dbb9",
-                    "leftValue": "={{ $json.done }}",
-                    "rightValue": false,
-                    "operator": {
-                      "type": "boolean",
-                      "operation": "true",
-                      "singleValue": true
-                    }
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputKey": "Output 1"
+              "id": "payload_json",
+              "displayName": "payload_json",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "dw_ingested_at",
+              "displayName": "dw_ingested_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "dw_updated_at",
+              "displayName": "dw_updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "source_page",
+              "displayName": "source_page",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false,
+              "removed": false
             }
-          ]
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
         },
-        "options": {
-          "fallbackOutput": 1
-        }
+        "options": {}
       },
-      "type": "n8n-nodes-base.switch",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
       "position": [
-        -80,
+        240,
         0
       ],
-      "id": "f4eaf05f-17b6-4614-8800-b28c94dfa7a2",
-      "name": "Switch"
+      "id": "195c02e8-bb1d-4bd3-ae78-ce3c5bb88d61",
+      "name": "Insert or update rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "obgnXNE4mqed4kfW",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = [];\n\nfor (const item of $input.all()) {\n  for (const data of item.json.data) {\n    output.push({\n      json: {\n        id: data.id,\n        payload_json: {\n          meta: item.json.meta,\n          data,\n        },\n      },\n    });\n  }\n}\n\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b32840db-37f9-4fb9-bc01-ba6cd6aa5090",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      execution_id: $execution.id,\n      page: 1,\n      started_at: new Date().toISOString(),\n      status: 'RUNNING',\n    },\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -224,
+        272
+      ],
+      "id": "cc067bb2-e77b-4df1-b1e0-949aa41a74a8",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO control.api_ingestion_runs (\n  execution_id,\n  started_at,\n  status\n)\nVALUES (\n  {{ $json.execution_id }},\n  now(),\n  'RUNNING'\n);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -416,
+        112
+      ],
+      "id": "efcb89f2-f58d-49ab-a2f0-17576dde1755",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "obgnXNE4mqed4kfW",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE control.api_ingestion_runs\nSET\n  finished_at = now(),\n  status = 'SUCCESS'\nWHERE execution_id = '{{ $execution.id }}';",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        720,
+        208
+      ],
+      "id": "4c2990fc-2d07-418d-b580-cd286e4c8e18",
+      "name": "Execute a SQL query1",
+      "credentials": {
+        "postgres": {
+          "id": "obgnXNE4mqed4kfW",
+          "name": "Postgres account"
+        }
+      }
     },
     {
       "parameters": {
@@ -142,13 +236,12 @@
           },
           "conditions": [
             {
-              "id": "3b010f0d-36c1-49cf-a04f-f2abbfc126d7",
-              "leftValue": "={{ $json.done }}",
-              "rightValue": false,
+              "id": "be078374-2840-422e-badb-de405f724a54",
+              "leftValue": "={{ $json.page }}",
+              "rightValue": "={{ $json.total + 1 }}",
               "operator": {
-                "type": "boolean",
-                "operation": "true",
-                "singleValue": true
+                "type": "number",
+                "operation": "equals"
               }
             }
           ],
@@ -159,31 +252,38 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        512,
-        0
+        448,
+        208
       ],
-      "id": "6ce76535-8882-4352-9beb-dac82b1c7f43",
+      "id": "befea1d1-4864-4a86-9261-5136de84dced",
       "name": "If"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -400,
+        272
+      ],
+      "id": "68aff0c8-ee3d-4b94-a539-95e5b3224995",
+      "name": "When Executed by Another Workflow"
     }
   ],
   "pinData": {},
   "connections": {
-    "When clicking ‘Execute workflow’": {
-      "main": [
-        [
-          {
-            "node": "Switch",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "HTTP Request": {
       "main": [
         [
           {
             "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code in JavaScript1",
             "type": "main",
             "index": 0
           }
@@ -201,11 +301,43 @@
         ]
       ]
     },
-    "Switch": {
+    "Code in JavaScript1": {
       "main": [
         [
           {
+            "node": "Insert or update rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          },
+          {
             "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        []
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query1",
             "type": "main",
             "index": 0
           }
@@ -219,12 +351,11 @@
         ]
       ]
     },
-    "If": {
+    "When Executed by Another Workflow": {
       "main": [
-        [],
         [
           {
-            "node": "Switch",
+            "node": "Code in JavaScript2",
             "type": "main",
             "index": 0
           }
@@ -232,15 +363,16 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1",
     "availableInMCP": false
   },
-  "versionId": "8e58fdc3-0f08-4b60-807a-c0dab1ca5d22",
+  "versionId": "e5ddfb9c-5fd8-4e66-9f84-99b2c6e881e4",
   "meta": {
-    "instanceId": "83ed8e48b446f86466e68583eba19a495563fce31281413dc0e97a2b5806d0d4"
+    "templateCredsSetupCompleted": true,
+    "instanceId": "532127a29babbf1fdd80b86cbe0240f1921f191d6c35b72962155da761ce9715"
   },
-  "id": "dwF94s7pFTWmjbstMAShR",
+  "id": "Uxm-SlghMh4gTtgUcR252",
   "tags": []
 }

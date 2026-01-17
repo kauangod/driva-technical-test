@@ -1,6 +1,5 @@
 /.venv/
 /.vscode/
-/test/
+workflows/test/
 pyrightconfig.json
-/workflows/database-check.json
-/workflows/http-api-request.json
+ingestion.py
