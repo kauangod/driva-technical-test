@@ -1,0 +1,312 @@
+{
+  "name": "processing",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -240,
+        32
+      ],
+      "id": "9a9a2284-a6a2-4970-b41f-6b46f7a72c3d",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM bronze.enriquecimentos ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -32,
+        32
+      ],
+      "id": "f51b5e0b-c604-4828-a75c-b8aecb3e3c73",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "4plBT0txHjkGd53X",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = [];\n\nfor (const item of $input.all()) {\n  const data = item.json.payload_json.data;\n\n  const updatedAt = new Date(data.updated_at);\n  const createdAt = new Date(data.created_at);\n  \n  const duracaoMinutos =\n    (updatedAt.getTime() - createdAt.getTime()) / 60000;\n  const totalContatos = data.total_contacts;\n\n  const toPgTimestamp = (iso) =>\n  new Date(iso).toISOString().replace(/\\.\\d{3}Z$/, \"+00:00\");\n  const createdAtPg = toPgTimestamp(data.created_at);\n  const updatedAtPg = toPgTimestamp(data.updated_at);\n    \n  const row = {\n    id_enriquecimento: data.id,\n    id_workspace: data.id_workspace,\n    nome_workspace: data.workspace_name,\n    total_contatos: totalContatos,\n    tipo_contato: data.contact_type === \"PERSON\" ? \"PESSOA\" : \"EMPRESA\",\n    status_processamento: \"\",\n    duracao_processamento_minutos: duracaoMinutos,\n    tempo_por_contato_minutos: totalContatos ? duracaoMinutos / totalContatos : 0,\n    processamento_sucesso: data.status === \"COMPLETED\",\n    categoria_tamanho_job: \"\",\n    necessita_reprocessamento: data.status === \"FAILED\" || data.status === \"CANCELED\",\n    data_criacao: createdAtPg.toString(),\n    data_atualizacao: updatedAtPg.toString(),\n    data_atualizacao_dw: toPgTimestamp(new Date().toString()),\n  };\n\n  if (data.status === \"COMPLETED\") {\n    row.status_processamento = \"CONCLUIDO\";\n  } else if (data.status === \"FAILED\") {\n    row.status_processamento = \"FALHOU\";\n  } else if (data.status === \"CANCELED\") {\n    row.status_processamento = \"CANCELADO\";\n  } else {\n    row.status_processamento = \"EM_PROCESSAMENTO\";\n  }\n\n  if (totalContatos < 100) {\n    row.categoria_tamanho_job = \"PEQUENO\";\n  } else if (totalContatos <= 500) {\n    row.categoria_tamanho_job = \"MEDIO\";\n  } else if (totalContatos <= 1000) {\n    row.categoria_tamanho_job = \"GRANDE\";\n  } else {\n    row.categoria_tamanho_job = \"MUITO_GRANDE\";\n  }\n\n  output.push({ json: row });\n}\n\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        176,
+        32
+      ],
+      "id": "4c87dcab-e8c9-4ab9-9234-7d7c9d630363",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        384,
+        32
+      ],
+      "id": "ba1cec8f-59ca-452b-afae-4fb1a15a4c0c",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "value": "gold",
+          "mode": "list",
+          "cachedResultName": "gold"
+        },
+        "table": {
+          "__rl": true,
+          "value": "enriquecimentos",
+          "mode": "list",
+          "cachedResultName": "enriquecimentos"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {
+            "processamento_sucesso": false,
+            "necessita_reprocessamento": false,
+            "total_contatos": 0,
+            "duracao_processamento_minutos": 0,
+            "tempo_por_contato_minutos": 0
+          },
+          "matchingColumns": [
+            "id_enriquecimento"
+          ],
+          "schema": [
+            {
+              "id": "id_enriquecimento",
+              "displayName": "id_enriquecimento",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "id_workspace",
+              "displayName": "id_workspace",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "nome_workspace",
+              "displayName": "nome_workspace",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "total_contatos",
+              "displayName": "total_contatos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "tipo_contato",
+              "displayName": "tipo_contato",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "status_processamento",
+              "displayName": "status_processamento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "duracao_processamento_minutos",
+              "displayName": "duracao_processamento_minutos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "tempo_por_contato_minutos",
+              "displayName": "tempo_por_contato_minutos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "processamento_sucesso",
+              "displayName": "processamento_sucesso",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "categoria_tamanho_job",
+              "displayName": "categoria_tamanho_job",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "necessita_reprocessamento",
+              "displayName": "necessita_reprocessamento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "data_criacao",
+              "displayName": "data_criacao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "data_atualizacao",
+              "displayName": "data_atualizacao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "data_atualizacao_dw",
+              "displayName": "data_atualizacao_dw",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        624,
+        32
+      ],
+      "id": "4b5bc36d-aecf-415a-a18e-3fe5e540da68",
+      "name": "Insert or update rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "4plBT0txHjkGd53X",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Insert or update rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert or update rows in a table": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "cbe26b12-40a0-456c-a7da-c61b0bf223aa",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6b9613d4d4cb1ca83a46ec5a746f8b843de1f37ca74dac69ffdb53325cde6a0c"
+  },
+  "id": "eXwD1aDrKD0qlWdWhfAVH",
+  "tags": []
+}

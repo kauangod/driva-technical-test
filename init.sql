@@ -48,6 +48,14 @@ CREATE TABLE control.api_ingestion_runs (
   status TEXT
 );
 
+CREATE TABLE control.dw_pipeline_state (
+  execution_id TEXT PRIMARY KEY,
+  started_at TIMESTAMP,
+  finished_at TIMESTAMP,
+  records_counter INTEGER,
+  status TEXT
+);
+
 INSERT INTO api_enrichments_seed.enriquecimentos (
   id,
   id_workspace,
@@ -73,3 +81,7 @@ SELECT
   now() - (random() * interval '1 day'),
   now()
 FROM generate_series(1, 5000) gs;
+
+CREATE INDEX idx_gold_enriquecimentos_id_workspace
+  ON gold.enriquecimentos (id_workspace); -- Índice para otimização de consultas pelo campo mais utilizado nos consumos via dashboard.
+

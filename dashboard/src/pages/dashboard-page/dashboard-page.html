@@ -1,0 +1,179 @@
+<div class="border rounded-lg mt-4 mx-2 flex-col flex gap-3 justify-between text-center ">
+    <span class="text-3xl">
+      Jobs
+    </span>
+  <div class="flex flex-row justify-between *:p-5 *:border *:rounded-lg m-2 *:flex *:flex-col *:text-center *:justify-center">
+    <div>
+      <span>
+        Small
+      </span>
+      <span>
+        {{jobsQuantity?.small_jobs}}
+      </span>
+    </div>
+    <div>
+      <span>
+       Medium
+      </span>
+      <span>
+        {{jobsQuantity?.medium_jobs}}
+      </span>
+    </div>
+    <div>
+      <span>
+      Large
+      </span>
+      <span>
+        {{jobsQuantity?.large_jobs}}
+      </span>
+    </div>
+    <div>
+      <span>
+      Very large
+      </span>
+      <span>
+        {{jobsQuantity?.very_large_jobs}}
+      </span>
+    </div>
+    <div>
+      <span>
+        Total
+      </span>
+      <span>
+        {{jobsQuantity?.total_jobs}}
+      </span>
+    </div>
+  </div>
+</div>
+
+<div class="m-4 flex flex-col gap-3 overflow-x-auto">
+  <span class="text-3xl">
+    Filtros
+  </span>
+  <form [formGroup]="form" class="gap-3 flex flex-row justify-around">
+    <div class="w-fit" formGroupName="dateCreated">
+      <mat-form-field>
+        <mat-label>Created date filter</mat-label>
+
+        <mat-date-range-input [rangePicker]="picker">
+          <input matStartDate formControlName="start" placeholder="Start date">
+          <input matEndDate formControlName="end" placeholder="End date">
+        </mat-date-range-input>
+
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-form-field>
+        <mat-label>Id filter</mat-label>
+        <input matInput formControlName="id" placeholder="Workspace Id">
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-form-field>
+        <mat-label>Status filter</mat-label>
+        <mat-select formControlName="status">
+          <mat-option value="">None</mat-option>
+          @for (status of statuses; track status) {
+            <mat-option [value]="status.value">
+              {{ status.viewValue }}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+  </form>
+
+</div>
+<div class="mat-elevation-z8 overflow-x-auto mx-2">
+<table mat-table [dataSource]="enrichmentTableSource ?? []" class="mat-elevation-z8">
+
+  <ng-container matColumnDef="nome_workspace">
+    <th mat-header-cell *matHeaderCellDef> Workspace </th>
+    <td mat-cell *matCellDef="let e"> {{ e.nome_workspace }} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="total_contatos">
+    <th mat-header-cell *matHeaderCellDef> Total Contacts </th>
+    <td mat-cell *matCellDef="let e"> {{ e.total_contatos }} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="tipo_contato">
+    <th mat-header-cell *matHeaderCellDef> Contact Type </th>
+    <td mat-cell *matCellDef="let e"> {{ e.tipo_contato }} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="status_processamento">
+    <th mat-header-cell *matHeaderCellDef> Status </th>
+    <td mat-cell *matCellDef="let e"> {{ e.status_processamento }} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="duracao_processamento_minutos">
+    <th mat-header-cell *matHeaderCellDef> Duration (min) </th>
+    <td mat-cell *matCellDef="let e"> {{ e.duracao_processamento_minutos }} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="tempo_por_contato_minutos">
+    <th mat-header-cell *matHeaderCellDef> Time / Contact (min) </th>
+    <td mat-cell *matCellDef="let e"> {{ e.tempo_por_contato_minutos }} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="processamento_sucesso">
+    <th mat-header-cell *matHeaderCellDef> Success </th>
+    <td mat-cell *matCellDef="let e">
+      {{ e.processamento_sucesso ? 'Yes' : 'No' }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="categoria_tamanho_job">
+    <th mat-header-cell *matHeaderCellDef> Job Size </th>
+    <td mat-cell *matCellDef="let e"> {{ e.categoria_tamanho_job }} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="necessita_reprocessamento">
+    <th mat-header-cell *matHeaderCellDef> Reprocess </th>
+    <td mat-cell *matCellDef="let e">
+      {{ e.necessita_reprocessamento ? 'Yes' : 'No' }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="data_criacao">
+    <th mat-header-cell *matHeaderCellDef> Created </th>
+    <td mat-cell *matCellDef="let e"> {{ e.data_criacao | date:'short' }} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="data_atualizacao">
+    <th mat-header-cell *matHeaderCellDef> Updated </th>
+    <td mat-cell *matCellDef="let e"> {{ e.data_atualizacao | date:'short' }} </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="enrichmentTableDisplayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: enrichmentTableDisplayedColumns;"></tr>
+
+</table>
+
+  <mat-paginator [pageSizeOptions]="[5, 10, 20]"
+                 showFirstLastButtons
+                 aria-label="Select page of periodic elements">
+  </mat-paginator>
+</div>
+<div class="justify-center flex">
+<table mat-table [dataSource]="topEnrichmentTableSource ?? []" class="mat-elevation-z8">
+
+  <ng-container matColumnDef="nome_workspace">
+    <th mat-header-cell *matHeaderCellDef>Workspace</th>
+    <td mat-cell *matCellDef="let e">{{ e.nome_workspace }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="total_contatos">
+    <th mat-header-cell *matHeaderCellDef>Total Jobs</th>
+    <td mat-cell *matCellDef="let e">{{ e.total_jobs }}</td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="topEnrichmentsDisplayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: topEnrichmentsDisplayedColumns;"></tr>
+
+</table>
+</div>

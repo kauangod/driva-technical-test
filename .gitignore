@@ -3,3 +3,4 @@
 workflows/test/
 pyrightconfig.json
 ingestion.py
+processing.py

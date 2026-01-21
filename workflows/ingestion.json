@@ -33,7 +33,7 @@
       "maxTries": 5,
       "credentials": {
         "httpBearerAuth": {
-          "id": "NDO1l3a6JH5BcoBH",
+          "id": "pCFFON7eIsT8E8MD",
           "name": "Bearer Auth account"
         }
       }
@@ -152,7 +152,7 @@
       "name": "Insert or update rows in a table",
       "credentials": {
         "postgres": {
-          "id": "obgnXNE4mqed4kfW",
+          "id": "4plBT0txHjkGd53X",
           "name": "Postgres account"
         }
       }
@@ -199,7 +199,7 @@
       "name": "Execute a SQL query",
       "credentials": {
         "postgres": {
-          "id": "obgnXNE4mqed4kfW",
+          "id": "4plBT0txHjkGd53X",
           "name": "Postgres account"
         }
       }
@@ -220,7 +220,7 @@
       "name": "Execute a SQL query1",
       "credentials": {
         "postgres": {
-          "id": "obgnXNE4mqed4kfW",
+          "id": "4plBT0txHjkGd53X",
           "name": "Postgres account"
         }
       }
@@ -363,15 +363,15 @@
       ]
     }
   },
-  "active": true,
+  "active": false,
   "settings": {
     "executionOrder": "v1",
     "availableInMCP": false
   },
-  "versionId": "e5ddfb9c-5fd8-4e66-9f84-99b2c6e881e4",
+  "versionId": "835987c0-412f-4873-af40-3e078ec51432",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "532127a29babbf1fdd80b86cbe0240f1921f191d6c35b72962155da761ce9715"
+    "instanceId": "6b9613d4d4cb1ca83a46ec5a746f8b843de1f37ca74dac69ffdb53325cde6a0c"
   },
   "id": "Uxm-SlghMh4gTtgUcR252",
   "tags": []

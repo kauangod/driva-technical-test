@@ -42,16 +42,129 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.3,
       "position": [
-        0,
+        -128,
         0
       ],
       "id": "86e2e077-8841-4482-a8bc-604605f732f8",
       "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "eXwD1aDrKD0qlWdWhfAVH",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/eXwD1aDrKD0qlWdWhfAVH",
+          "cachedResultName": "processing"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "cbe2ebb9-5674-4e36-b04c-3826afc2f4bd",
+      "name": "Call 'processing'"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO control.dw_pipeline_state (\n  execution_id,\n  started_at,\n  status\n)\nVALUES (\n  {{ $execution.id }},\n  now(),\n  'RUNNING'\n);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        32,
+        0
+      ],
+      "id": "ad162147-cd51-471f-bf93-065caebe83eb",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "4plBT0txHjkGd53X",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE control.api_ingestion_runs\nSET\n  finished_at = now(),\n  records_counter = (SELECT COUNT(*) FROM gold.enriquecimentos),\n  status = 'SUCCESS'\nWHERE execution_id = '{{ $execution.id}}';",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        592,
+        0
+      ],
+      "id": "1d685017-d140-4094-a356-c48e11730ebc",
+      "name": "Execute a SQL query1",
+      "credentials": {
+        "postgres": {
+          "id": "4plBT0txHjkGd53X",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM control.dw_pipeline_state",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        784,
+        0
+      ],
+      "id": "8fe9dbce-5eaa-4d83-af3a-9f75f8de8e10",
+      "name": "Execute a SQL query2",
+      "credentials": {
+        "postgres": {
+          "id": "4plBT0txHjkGd53X",
+          "name": "Postgres account"
+        }
+      }
     }
   ],
   "pinData": {},
   "connections": {
     "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'ingestion'": {
+      "main": [
+        [
+          {
+            "node": "Call 'processing'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
       "main": [
         [
           {
@@ -61,16 +174,44 @@
           }
         ]
       ]
+    },
+    "Call 'processing'": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query1": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query2": {
+      "main": [
+        []
+      ]
     }
   },
-  "active": true,
+  "active": false,
   "settings": {
     "executionOrder": "v1",
     "availableInMCP": false
   },
-  "versionId": "b48de5ca-66c3-432e-82c8-6b693ce43869",
+  "versionId": "fc969e0e-88f8-4df1-988b-1ce0714a97b2",
   "meta": {
-    "instanceId": "532127a29babbf1fdd80b86cbe0240f1921f191d6c35b72962155da761ce9715"
+    "instanceId": "6b9613d4d4cb1ca83a46ec5a746f8b843de1f37ca74dac69ffdb53325cde6a0c",
+    "templateCredsSetupCompleted": true
   },
   "id": "LZr4ay4Ilzg9ytoiGTjgP",
   "tags": []

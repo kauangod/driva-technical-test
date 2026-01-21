@@ -1,0 +1,72 @@
+{
+  "name": "generate_new_data",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b1bc4890-fe37-4ee2-a05e-4e6b4e4c27bf",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO api_enrichments_seed.enriquecimentos (\n  id,\n  id_workspace,\n  workspace_name,\n  total_contacts,\n  contact_type,\n  status,\n  created_at,\n  updated_at\n)\nSELECT\n  gen_random_uuid(),\n  gen_random_uuid(),\n  'Workspace Teste ' || (floor(random() * 5000) + 1)::int,\n  (random() * 1500)::int,\n  CASE WHEN random() > 0.5 THEN 'COMPANY' ELSE 'PERSON' END,\n  CASE\n    WHEN random() < 0.2 THEN 'CANCELED'\n    WHEN random() < 0.7 THEN 'COMPLETED'\n    WHEN random() < 0.85 THEN 'FAILED'\n    ELSE 'PROCESSING'\n  END,\n  now() - (random() * interval '1 day'),\n  now()\nFROM generate_series(1, 5000) gs;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        208,
+        0
+      ],
+      "id": "7d85e717-1553-45cb-b379-bd66f6215ff5",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "4plBT0txHjkGd53X",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "1f4d6e57-d5da-4479-a915-c16881aaca6f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6b9613d4d4cb1ca83a46ec5a746f8b843de1f37ca74dac69ffdb53325cde6a0c"
+  },
+  "id": "Kk2S6bHxm7AO2I3Uy6WRZ",
+  "tags": []
+}
