@@ -57,3 +57,16 @@ O dashboard deve ser executado após ou durante o workflow de processamento para
 
 ![Exemplo de requisição no dashboard](assets/dash4.png)
 ***Requisição no endpoint de enrichments, através do dashboard.***
+
+## Guia pelos diretórios (árvore)
+
+```
+.
+├── api/                 # API FastAPI e Dockerfile do serviço
+├── assets/              # Imagens usadas no README
+├── dashboard/           # Front-end Angular
+├── workflows/           # Workflows do n8n
+├── docker-compose.yml   # Orquestração dos serviços
+├── init.sh              # Script de inicialização do ambiente
+├── init.sql             # Criação das tabelas e seeds
+```
